@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Вадим Кордович](https://up.htmlacademy.ru/javascript/16/user/646617).
-* Наставник: `Неизвестно`.
+* Наставник: [Евгений Сальников](https://up.htmlacademy.ru/javascript/16/user/24537).
 
 ---
 
