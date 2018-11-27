@@ -74,7 +74,8 @@ bigPictureElement.classList.remove('hidden');
 
 // список комментариев
 var socComments = document.querySelector('.social__comments');
-var socComment = document.querySelectorAll('.social__comment');
+var socComment = document.querySelector('.social__comment');
+var socCommentAll = document.querySelectorAll('.social__comment');
 
 // удаление каждого комментария
 var removeElements = function (parent, child) {
@@ -86,16 +87,14 @@ var removeElements = function (parent, child) {
 // создание комментариев
 var renderComments = function (data) {
   var fragment = document.createDocumentFragment();
-
+  var commentItem = socComment.cloneNode(true);
   for (var i = 0; i < data.comments.length; i++) {
-    var commentItem = socComment[i].cloneNode(true);
     commentItem.querySelector('.social__picture').src = 'img/avatar-' + generateNumber(1, 6) + '.svg';
     commentItem.querySelector('.social__text').textContent = data.comments[i];
-    fragment.appendChild(commentItem);
+    fragment.appendChild(commentItem.cloneNode(true));
   }
 
-  removeElements(socComments, socComment);
-
+  removeElements(socComments, socCommentAll);
 
   return socComments.appendChild(fragment);
 };
