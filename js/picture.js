@@ -31,7 +31,7 @@ var generateNumber = function (min, max) {
 var qtyComments = function (qty) {
   var currentComment = [];
   for (var t = 0; t < qty; t++) {
-    currentComment[t] = comment[generateNumber(0, comment.length)];
+    currentComment[t] = comment[generateNumber(0, comment.length - 1)];
   }
   return currentComment;
 };
