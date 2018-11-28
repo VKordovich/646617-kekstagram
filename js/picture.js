@@ -73,30 +73,58 @@ renderBlockElements(QUANTITY_PHOTOS);
 bigPictureElement.classList.remove('hidden');
 
 // список комментариев
-var socComments = document.querySelector('.social__comments');
-var socComment = document.querySelector('.social__comment');
-var socCommentAll = document.querySelectorAll('.social__comment');
+var socCommentParent = document.querySelector('.social');
+var socCommentUl = document.querySelector('.social__comments');
+var socCommentButton = document.querySelector('.social__comments-loader');
 
 // удаление каждого комментария
 var removeElements = function (parent, child) {
-  for (var i = 0; i < child.length; i++) {
-    parent.removeChild(child[i]);
+  parent.removeChild(child);
+};
+
+var createCooment = function (data) {
+  var myP = document.createElement('p');
+  var fragmente = document.createDocumentFragment();
+  for (var i = 0; i < data.comments.length; i++) {
+    myP.classList.add('social__text');
+    myP.textContent = data.comments[i];
+    fragmente.appendChild(myP);
   }
+  return fragmente;
+};
+
+var createIcon = function (data) {
+  var myImg = document.createElement('img');
+  var fragmentu = document.createDocumentFragment();
+  for (var i = 0; i < data.comments.length; i++) {
+    myImg.classList.add('social__picture');
+    myImg.src = 'img/avatar-' + generateNumber(1, 6) + '.svg';
+    myImg.alt = 'Аватар комментатора фотографии';
+    myImg.width = 35;
+    myImg.height = 35;
+    fragmentu.appendChild(myImg);
+  }
+  return fragmentu;
 };
 
 // создание комментариев
-var renderComments = function (data) {
+var createCommentsList = function (data) {
+  removeElements(socCommentParent, socCommentUl);
+  var myUl = document.createElement('ul');
+  var myLi = document.createElement('li');
+
   var fragment = document.createDocumentFragment();
-  var commentItem = socComment.cloneNode(true);
+  myUl.classList.add('social__comments');
+
   for (var i = 0; i < data.comments.length; i++) {
-    commentItem.querySelector('.social__picture').src = 'img/avatar-' + generateNumber(1, 6) + '.svg';
-    commentItem.querySelector('.social__text').textContent = data.comments[i];
-    fragment.appendChild(commentItem.cloneNode(true));
+    myLi.classList.add('social__comment');
+    myLi.appendChild(createIcon(photo[1]));
+    myLi.appendChild(createCooment(photo[1]));
+    fragment.appendChild(myLi);
   }
 
-  removeElements(socComments, socCommentAll);
-
-  return socComments.appendChild(fragment);
+  myUl.appendChild(fragment);
+  return socCommentParent.insertBefore(myUl, socCommentButton);
 };
 
 // отрисовка большой фотографии
@@ -105,7 +133,7 @@ var renderBigPictureElement = function (bigPic) {
   bigPictureElement.querySelector('.likes-count').textContent = bigPic.likes;
   bigPictureElement.querySelector('.comments-count').textContent = bigPic.comments.length;
   bigPictureElement.querySelector('.social__caption').textContent = bigPic.description;
-  renderComments(photo[1]);
+  createCommentsList(photo[1]);
   return bigPictureElement;
 };
 
