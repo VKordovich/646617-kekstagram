@@ -117,3 +117,53 @@ document.querySelector('.comments-loader').classList.add('visually-hidden');
 
 
 // задание - подробности
+// загрузка изображения
+var imgUploadOverlay = document.querySelector('.img-upload__overlay');
+var imgUploadButton = document.getElementById('upload-file');
+var imgCloseButton = document.getElementById('upload-cancel');
+var imgUploadForm = document.querySelector('.img-upload__form');
+
+var openUploadWindow = function () {
+  imgUploadOverlay.classList.remove('hidden');
+  document.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === 27) {
+      imgUploadOverlay.classList.add('hidden');
+      imgUploadForm.reset();
+    }
+  });
+};
+
+var closeUploadWindow = function () {
+  imgUploadOverlay.classList.add('hidden');
+  imgUploadForm.reset();
+};
+
+imgUploadButton.addEventListener('change', function () {
+  openUploadWindow();
+});
+
+imgCloseButton.addEventListener('click', function () {
+  closeUploadWindow();
+});
+
+
+// Применение эффекта для изображения
+var effectLevelPin = imgUploadOverlay.querySelector('.effect-level__pin');
+var imgUploadPreview = imgUploadOverlay.querySelector('.img-upload__preview');
+var effectsRadio = imgUploadOverlay.querySelectorAll('.effects__radio');
+var allClassRadio = ['effects__preview--none', 'effects__preview--chrome', 'effects__preview--sepia', 'effects__preview--marvin', 'effects__preview--phobos', 'effects__preview--heat'];
+
+effectLevelPin.addEventListener('mousep', function () {
+});
+
+var addEffect = function (radio, effect) {
+  radio.addEventListener('click', function () {
+    imgUploadPreview.querySelector('img').removeAttribute('class');
+    imgUploadPreview.querySelector('img').classList.add(effect);
+  });
+};
+
+for (var i = 0; i < effectsRadio.length; i++) {
+  addEffect(effectsRadio[i], allClassRadio[i]);
+}
+
