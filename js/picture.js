@@ -158,6 +158,11 @@ effectLevelPin.addEventListener('mousep', function () {
 
 var addEffect = function (radio, effect) {
   radio.addEventListener('click', function () {
+    if (effect === 'effects__preview--none') {
+      effectLevelPin.classList.add('hidden');
+    } else {
+      effectLevelPin.classList.remove('hidden');
+    }
     imgUploadPreview.querySelector('img').removeAttribute('class');
     imgUploadPreview.querySelector('img').classList.add(effect);
   });
@@ -167,3 +172,41 @@ for (var i = 0; i < effectsRadio.length; i++) {
   addEffect(effectsRadio[i], allClassRadio[i]);
 }
 
+// размер изображения
+var scaleControlSmaller = imgUploadOverlay.querySelector('.scale__control--smaller');
+var scaleControlBigger = imgUploadOverlay.querySelector('.scale__control--bigger');
+var scaleControlValue = imgUploadOverlay.querySelector('.scale__control--value').getAttribute('value'); // считает от этого значения
+var scaleControlValueMonitor = imgUploadOverlay.querySelector('.scale__control--value');
+var SCALE_STEP = 25;
+var MIN_SCALE = 25;
+var MAX_SCALE = 100;
+
+var decreaseScale = function () {
+  if (parseFloat(scaleControlValue) !== MIN_SCALE) {
+    var currentValue = parseFloat(scaleControlValue) - SCALE_STEP + '%';
+    scaleControlValueMonitor.setAttribute('value', currentValue);
+    imgUploadPreview.querySelector('img').style.transform = 'scale(0.75)';
+  } else {
+    currentValue = parseFloat(scaleControlValue);
+    imgUploadPreview.querySelector('img').style.transform = 'scale(0.25)';
+  }
+};
+
+var increaseScale = function () {
+  if (parseFloat(scaleControlValue) !== MAX_SCALE) {
+    var currentValue = parseFloat(scaleControlValue) + SCALE_STEP + '%';
+    scaleControlValueMonitor.setAttribute('value', currentValue);
+    imgUploadPreview.querySelector('img').style.transform = 'scale(0.' + currentValue + ')'; // в таком формате не работает
+  } else {
+    currentValue = parseFloat(scaleControlValue);
+    imgUploadPreview.querySelector('img').style.transform = 'scale(1)';
+  }
+};
+
+scaleControlSmaller.addEventListener('click', function () {
+  decreaseScale();
+});
+
+scaleControlBigger.addEventListener('click', function () {
+  increaseScale();
+});
