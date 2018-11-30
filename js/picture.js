@@ -56,6 +56,10 @@ var renderPictureElement = function (pic) {
   pictureElement.querySelector('.picture__img').src = pic.url;
   pictureElement.querySelector('.picture__likes').textContent = pic.likes;
   pictureElement.querySelector('.picture__comments').textContent = pic.comments.length;
+  pictureElement.addEventListener('click', function () {
+    openBigPicture();
+    bigPictureElement.querySelector('.big-picture__img img').src = pic.url;
+  });
   return pictureElement;
 };
 
@@ -116,7 +120,7 @@ document.querySelector('.social__comment-count').classList.add('visually-hidden'
 document.querySelector('.comments-loader').classList.add('visually-hidden');
 
 
-// задание - подробности
+// Загрузка изображения и показ формы редактирования
 // загрузка изображения
 var imgUploadOverlay = document.querySelector('.img-upload__overlay');
 var imgUploadButton = document.getElementById('upload-file');
@@ -172,7 +176,7 @@ for (var i = 0; i < effectsRadio.length; i++) {
   addEffect(effectsRadio[i], allClassRadio[i]);
 }
 
-// размер изображения
+// Редактирование размера изображения
 var scaleControlSmaller = imgUploadOverlay.querySelector('.scale__control--smaller');
 var scaleControlBigger = imgUploadOverlay.querySelector('.scale__control--bigger');
 var scaleControlValue = imgUploadOverlay.querySelector('.scale__control--value').getAttribute('value'); // считает от этого значения
@@ -209,4 +213,25 @@ scaleControlSmaller.addEventListener('click', function () {
 
 scaleControlBigger.addEventListener('click', function () {
   increaseScale();
+});
+
+// Показ изображения в полноэкранном режиме
+
+var bigPictureCancel = bigPictureElement.querySelector('.big-picture__cancel');
+
+var openBigPicture = function () {
+  bigPictureElement.classList.remove('hidden');
+  document.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === 27) {
+      bigPictureElement.classList.add('hidden');
+    }
+  });
+};
+
+var closeBigPicture = function () {
+  bigPictureElement.classList.add('hidden');
+};
+
+bigPictureCancel.addEventListener('click', function () {
+  closeBigPicture();
 });
