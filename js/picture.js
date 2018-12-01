@@ -113,7 +113,6 @@ var renderBigPictureElement = function (bigPic) {
   return bigPictureElement;
 };
 
-renderBigPictureElement(photo[1]);
 
 // скрытие блока счетчика комментариев и загрузки новых комментов
 document.querySelector('.social__comment-count').classList.add('visually-hidden');
