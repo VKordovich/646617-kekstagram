@@ -58,7 +58,7 @@ var renderPictureElement = function (pic) {
   pictureElement.querySelector('.picture__comments').textContent = pic.comments.length;
   pictureElement.addEventListener('click', function () {
     openBigPicture();
-    bigPictureElement.querySelector('.big-picture__img img').src = pic.url;
+    renderBigPictureElement(pic);
   });
   return pictureElement;
 };
