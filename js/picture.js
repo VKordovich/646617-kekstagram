@@ -128,12 +128,14 @@ var imgUploadForm = document.querySelector('.img-upload__form');
 
 var openUploadWindow = function () {
   imgUploadOverlay.classList.remove('hidden');
-  document.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === 27) {
-      imgUploadOverlay.classList.add('hidden');
-      imgUploadForm.reset();
-    }
-  });
+  document.addEventListener('keydown', closeWindowEsc);
+};
+
+var closeWindowEsc = function (evt) {
+  if (evt.keyCode === 27) {
+    imgUploadOverlay.classList.add('hidden');
+    imgUploadForm.reset();
+  }
 };
 
 var closeUploadWindow = function () {
@@ -233,4 +235,79 @@ var closeBigPicture = function () {
 
 bigPictureCancel.addEventListener('click', function () {
   closeBigPicture();
+});
+
+// взять строку с хештегами, превратить в массив
+// колличество элементов массива не больше 5
+// каждый элемент массива проверить на наличие # и колличества символов и наличия одинаковых
+// пробел проверить после хештега
+// если фокус на поле, то не закрывать и покрасить в зеленый(иначе красный)
+
+// Хэш-теги
+var textHashtags = document.querySelector('.text__hashtags');
+// var textDescription = document.querySelector('.text__description');
+var QTY_MAX_HASHTAG = 5;
+var QTY_MAX_SYMBOLS = 20;
+var QTY_MIN_SYMBOLS = 1;
+
+// преобразует строку из инпута в массив
+var transformStringToArray = function (string) {
+  var stringHashtags = string.value;
+  var hashtagsArray = stringHashtags.split(' ');
+  return hashtagsArray;
+};
+
+var checkSymbols = function () {
+  var receivedArray = transformStringToArray(textHashtags);
+  for (var j = 0; j < receivedArray.length; j++) {
+    var firstSymbol = String(receivedArray[j].split('', 1)); // можно через chartAt();
+    var qtySymbols = receivedArray[j].split('');
+    if (firstSymbol !== '#') {
+      textHashtags.setCustomValidity('Хэш-тег начинается с символа # (решётка)');
+    } else if (qtySymbols.length < QTY_MIN_SYMBOLS) {
+      textHashtags.setCustomValidity('Хэш-тег не может состоять только из одной решётки');
+    } else if (qtySymbols[qtySymbols.length - 1] !== ' ') {
+      textHashtags.setCustomValidity('Хэш-теги разделяются пробелами');
+    } else if (qtySymbols.length >= QTY_MAX_SYMBOLS) {
+      textHashtags.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая решётку');
+    } else {
+      textHashtags.setCustomValidity('');
+    }
+  }
+};
+
+var checkSimilarHashtag = function () {
+  var receivedArray = transformStringToArray(textHashtags);
+  for (var j = 0; j < receivedArray.length - 2; j++) {
+    var firstHashtag = receivedArray[j];
+
+    for (var k = j + 1; k < receivedArray.length; k++) {
+      if (firstHashtag === receivedArray[k]) {
+        textHashtags.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
+      } else {
+        textHashtags.setCustomValidity('');
+      }
+    }
+  }
+};
+
+var checkQtyHashtags = function () {
+  var receivedArray = transformStringToArray(textHashtags);
+  if (receivedArray.length > QTY_MAX_HASHTAG) {
+    textHashtags.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
+  } else {
+    textHashtags.setCustomValidity('');
+  }
+};
+
+var onFocus = function () {
+  textHashtags.style.borderColor = 'blue';
+  document.removeEventListener('keydown', closeWindowEsc);
+};
+
+textHashtags.addEventListener('invalid', function () {
+  checkSymbols();
+  checkSimilarHashtag();
+  checkQtyHashtags();
+  onFocus();
 });
