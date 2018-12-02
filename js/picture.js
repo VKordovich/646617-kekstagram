@@ -237,18 +237,22 @@ bigPictureCancel.addEventListener('click', function () {
   closeBigPicture();
 });
 
-// взять строку с хештегами, превратить в массив
-// колличество элементов массива не больше 5
-// каждый элемент массива проверить на наличие # и колличества символов и наличия одинаковых
-// пробел проверить после хештега
-// если фокус на поле, то не закрывать и покрасить в зеленый(иначе красный)
-
 // Хэш-теги
 var textHashtags = document.querySelector('.text__hashtags');
 // var textDescription = document.querySelector('.text__description');
 var QTY_MAX_HASHTAG = 5;
 var QTY_MAX_SYMBOLS = 20;
 var QTY_MIN_SYMBOLS = 1;
+var validity = {
+  isValiditySharp: false,
+  isValidityOnlySharp: false,
+  isValiditySpace: false,
+  isValidityDoubleHashtag: false,
+  isValidityQtyHashtags: false,
+  isValidityLengthHashtag: false,
+  isValidityHeightSymbols: false,
+  isValidityFocus: false
+};
 
 // преобразует строку из инпута в массив
 var transformStringToArray = function (string) {
@@ -257,57 +261,183 @@ var transformStringToArray = function (string) {
   return hashtagsArray;
 };
 
-var checkSymbols = function () {
-  var receivedArray = transformStringToArray(textHashtags);
+
+// хэш-тег начинается с символа # (решётка)
+var checkSharp = function (hashTagArr) {
+  var receivedArray = hashTagArr;
   for (var j = 0; j < receivedArray.length; j++) {
-    var firstSymbol = String(receivedArray[j].split('', 1)); // можно через chartAt();
-    var qtySymbols = receivedArray[j].split('');
+    var firstSymbol = String(receivedArray[j].split('', 1));
     if (firstSymbol !== '#') {
-      textHashtags.setCustomValidity('Хэш-тег начинается с символа # (решётка)');
-    } else if (qtySymbols.length < QTY_MIN_SYMBOLS) {
-      textHashtags.setCustomValidity('Хэш-тег не может состоять только из одной решётки');
-    } else if (qtySymbols[qtySymbols.length - 1] !== ' ') {
-      textHashtags.setCustomValidity('Хэш-теги разделяются пробелами');
-    } else if (qtySymbols.length >= QTY_MAX_SYMBOLS) {
-      textHashtags.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая решётку');
-    } else {
-      textHashtags.setCustomValidity('');
+      return false;
     }
   }
+  return true;
 };
 
-var checkSimilarHashtag = function () {
-  var receivedArray = transformStringToArray(textHashtags);
+// хеш-тег не может состоять только из одной решётки
+var checkOnlySharp = function (hashTagArr) {
+  var receivedArray = hashTagArr;
+  for (var j = 0; j < receivedArray.length; j++) {
+    var qtySymbols = receivedArray[j].split('');
+    if (qtySymbols.length < QTY_MIN_SYMBOLS) {
+      return false;
+    }
+  }
+  return true;
+};
+
+// хэш-теги разделяются пробелами
+var checkSpace = function (hashTagArr) {
+  var receivedArray = hashTagArr;
+  for (var j = 0; j < receivedArray.length; j++) {
+    var qtySymbols = receivedArray[j].split('');
+    if (qtySymbols[qtySymbols.length - 1] !== ' ') {
+      return false;
+    }
+  }
+  return true;
+};
+
+// один и тот же хэш-тег не может быть использован дважды
+var checkDoubleHashtag = function (hashTagArr) {
+  var receivedArray = hashTagArr;
   for (var j = 0; j < receivedArray.length - 2; j++) {
-    var firstHashtag = receivedArray[j];
+    var underCheckingHashtag = receivedArray[j];
 
     for (var k = j + 1; k < receivedArray.length; k++) {
-      if (firstHashtag === receivedArray[k]) {
-        textHashtags.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
-      } else {
-        textHashtags.setCustomValidity('');
+      if (underCheckingHashtag === receivedArray[k]) {
+        return false;
       }
     }
   }
+  return true;
 };
 
-var checkQtyHashtags = function () {
-  var receivedArray = transformStringToArray(textHashtags);
+// нельзя указать больше пяти хэш-тегов
+var checkQtyHashtags = function (hashTagArr) {
+  var receivedArray = hashTagArr;
   if (receivedArray.length > QTY_MAX_HASHTAG) {
+    return false;
+  }
+  return true;
+};
+
+// максимальная длина одного хэш-тега 20 символов, включая решётку
+var checkLengthHashtag = function (hashTagArr) {
+  var receivedArray = hashTagArr;
+  for (var j = 0; j < receivedArray.length; j++) {
+    var qtySymbols = receivedArray[j].split('');
+    if (qtySymbols.length > QTY_MAX_SYMBOLS) {
+      return false;
+    }
+  }
+  return true;
+};
+
+// теги нечувствительны к регистру: #ХэшТег и #хэштег считаются одним и тем же тегом
+// var checkHeightSymbols = function () { };
+
+// если фокус находится в поле ввода хэш-тега, нажатие на Esc не должно приводить к закрытию формы редактирования изображения
+// var checkFocus = function () {
+//   textHashtags.style.borderColor = 'red';
+//   document.removeEventListener('keydown', closeWindowEsc);
+// };
+
+validity.isValiditySharp = checkSharp(transformStringToArray(textHashtags));
+validity.isValidityOnlySharp = checkOnlySharp(transformStringToArray(textHashtags));
+validity.isValiditySpace = checkSpace(transformStringToArray(textHashtags));
+validity.isValidityDoubleHashtag = checkDoubleHashtag(transformStringToArray(textHashtags));
+validity.isValidityQtyHashtags = checkQtyHashtags(transformStringToArray(textHashtags));
+validity.isValidityLengthHashtag = checkLengthHashtag(transformStringToArray(textHashtags));
+// validity.isValidityHeightSymbols=
+// validity.isValidityFocus=
+
+
+textHashtags.addEventListener('invalid', function () {
+  if (!validity.isValiditySharp) {
+    textHashtags.setCustomValidity('Хэш-тег начинается с символа # (решётка)');
+  } else if (!validity.isValidityOnlySharp) {
+    textHashtags.setCustomValidity('Хэш-тег не может состоять только из одной решётки');
+  } else if (!validity.isValiditySpace) {
+    textHashtags.setCustomValidity('Хэш-теги разделяются пробелами');
+  } else if (validity.isValidityDoubleHashtag) {
+    textHashtags.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
+  } else if (!validity.isValidityQtyHashtags) {
     textHashtags.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
+  } else if (!validity.isValidityLengthHashtag) {
+    textHashtags.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая решётку');
   } else {
     textHashtags.setCustomValidity('');
   }
-};
-
-var onFocus = function () {
-  textHashtags.style.borderColor = 'blue';
-  document.removeEventListener('keydown', closeWindowEsc);
-};
-
-textHashtags.addEventListener('invalid', function () {
-  checkSymbols();
-  checkSimilarHashtag();
-  checkQtyHashtags();
-  onFocus();
 });
+
+//
+//
+//
+//
+//
+// var checkSymbols = function () {
+//   var receivedArray = transformStringToArray(textHashtags);
+//   for (var j = 0; j < receivedArray.length; j++) {
+//     var firstSymbol = String(receivedArray[j].split('', 1)); // можно через chartAt();
+//     var qtySymbols = receivedArray[j].split('');
+//     if (firstSymbol !== '#') {
+//       return false;
+//     } else if (qtySymbols.length < QTY_MIN_SYMBOLS) {
+//       return false;
+//     } else if (qtySymbols[qtySymbols.length - 1] !== ' ') {
+//       return false;
+//     } else if (qtySymbols.length >= QTY_MAX_SYMBOLS) {
+//       return false;
+//     } else {
+//       return true;
+//     }
+//   }
+// };
+
+// var checkSimilarHashtag = function () {
+//   var receivedArray = transformStringToArray(textHashtags);
+//   for (var j = 0; j < receivedArray.length - 2; j++) {
+//     var firstHashtag = receivedArray[j];
+
+//     for (var k = j + 1; k < receivedArray.length; k++) {
+//       if (firstHashtag === receivedArray[k]) {
+//         return false;
+//       }
+//     }
+//   }
+//   return true;
+// };
+
+// var checkQtyHashtags = function () {
+// var receivedArray = transformStringToArray(textHashtags);
+// if (receivedArray.length > QTY_MAX_HASHTAG) {
+//   return false;
+// } else {
+//   return true;
+// }
+// };
+
+// var onFocus = function () {
+// textHashtags.style.borderColor = 'blue';
+// document.removeEventListener('keydown', closeWindowEsc);
+// return false;
+// };
+
+// validity.isValiditySymbols = checkSymbols();
+// validity.isValidityTagsTwo = checkSimilarHashtag();
+// validity.isValidityQtyTags = checkQtyHashtags();
+// validity.isValidityFocus = onFocus();
+
+
+// textHashtags.addEventListener('input', function () {
+//   if (validity.isValiditySymbols) {
+//     textHashtags.setCustomValidity('Хэш-тег начинается с символа # (решётка)');
+//   }
+// });
+// textHashtags.setCustomValidity('Хэш-тег начинается с символа # (решётка)');
+// textHashtags.setCustomValidity('Хэш-тег не может состоять только из одной решётки');
+// textHashtags.setCustomValidity('Хэш-теги разделяются пробелами');
+// textHashtags.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая решётку');
+// textHashtags.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
+// textHashtags.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
