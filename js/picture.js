@@ -243,57 +243,111 @@ var textHashtags = document.querySelector('.text__hashtags');
 var QTY_MAX_HASHTAG = 5;
 var QTY_MAX_SYMBOLS = 20;
 var QTY_MIN_SYMBOLS = 1;
+var validity = {
+  isValiditySharp: false,
+  isValidityOnlySharp: false,
+  isValiditySpace: false,
+  isValidityDoubleHashtag: false,
+  isValidityQtyHashtags: false,
+  isValidityLengthHashtag: false,
+};
 
-textHashtags.addEventListener('input', function (evt) {
-  var validity = {
-    isValiditySharp: false,
-    isValidityOnlySharp: false,
-    isValiditySpace: false,
-    isValidityDoubleHashtag: false,
-    isValidityQtyHashtags: false,
-    isValidityLengthHashtag: false,
-  };
-  var target = evt.target;
-  var stringHashtags = target.value;
-  var hashtagsArray = stringHashtags.split(' ');
+// преобразует строку из инпута в массив
+var transformStringToArray = function (string) {
+  var stringHashtags = string.value;
+  var receivedArray = stringHashtags.split(' ');
+  return receivedArray;
+};
 
-  if (stringHashtags.indexOf(',') > -1) { // Хэш-теги разделяются пробелами
+// хэш-тег начинается с символа # (решётка)
+var checkSharp = function (hashTagArr) {
+  var receivedArray = hashTagArr;
+  for (var j = 0; j < receivedArray.length; j++) {
+    var firstSymbol = String(receivedArray[j].split('', 1));
+    if (firstSymbol !== '#') {
+      validity.isValiditySharp = true;
+    }
+    validity.isValiditySharp = false;
+  }
+};
+
+// хеш-тег не может состоять только из одной решётки
+var checkOnlySharp = function (hashTagArr) {
+  var receivedArray = hashTagArr;
+  for (var j = 0; j < receivedArray.length; j++) {
+    var qtySymbols = receivedArray[j].split('');
+    if (qtySymbols.length < QTY_MIN_SYMBOLS) {
+      validity.isValidityOnlySharp = true;
+    }
+    validity.isValidityOnlySharp = false;
+  }
+};
+
+// хэш-теги разделяются пробелами
+var checkSpace = function (hashTagArr) {
+  var receivedArray = hashTagArr.value;
+  if (receivedArray.indexOf(',') > -1) {
     validity.isValiditySpace = true;
-  } else if (hashtagsArray.length > QTY_MAX_HASHTAG) { // нельзя указать больше пяти хэш-тегов
-    validity.isValidityQtyHashtags = true;
-  } else {
-    for (var j = 0; j < hashtagsArray.length; j++) {
-      var firstSymbol = String(hashtagsArray[j].split('', 1));
-      var qtySymbols = hashtagsArray[j].split('');
-      if (firstSymbol !== '#') { // хэш-тег начинается с символа # (решётка)
-        validity.isValiditySharp = true;
-      } else if (qtySymbols.length < QTY_MIN_SYMBOLS) { // хеш-тег не может состоять только из одной решётки
-        validity.isValidityOnlySharp = true;
-      } else if (qtySymbols.length > QTY_MAX_SYMBOLS) { // максимальная длина одного хэш-тега 20 символов, включая решётку
-        validity.isValidityLengthHashtag = true;
-      } else {
-        for (var k = 0; k < j; k++) {
-          if (hashtagsArray[j].toLowerCase() === hashtagsArray[k].toLowerCase()) { // теги нечувствительны к регистру: #ХэшТег и #хэштег считаются одним и тем же тегом
-            validity.isValidityDoubleHashtag = true; // один и тот же хэш-тег не может быть использован дважды
-          }
-        }
+  }
+  validity.isValiditySpace = false;
+};
+
+// один и тот же хэш-тег не может быть использован дважды
+// теги нечувствительны к регистру: #ХэшТег и #хэштег считаются одним и тем же тегом
+var checkDoubleHashtag = function (hashTagArr) {
+  var receivedArray = hashTagArr;
+  for (var j = 0; j < receivedArray.length; j++) {
+    for (var k = j + 1; k < j; k++) {
+      if (receivedArray[j].toLowerCase() === receivedArray[k].toLowerCase()) {
+        validity.isValidityDoubleHashtag = true;
       }
+      validity.isValidityDoubleHashtag = false;
     }
   }
+};
+
+// нельзя указать больше пяти хэш-тегов
+var checkQtyHashtags = function (hashTagArr) {
+  var receivedArray = hashTagArr;
+  if (receivedArray.length > QTY_MAX_HASHTAG) {
+    validity.isValidityQtyHashtags = true;
+  }
+  validity.isValidityQtyHashtags = false;
+};
+
+// максимальная длина одного хэш-тега 20 символов, включая решётку
+var checkLengthHashtag = function (hashTagArr) {
+  var receivedArray = hashTagArr;
+  for (var j = 0; j < receivedArray.length; j++) {
+    var qtySymbols = receivedArray[j].split('');
+    if (qtySymbols.length > QTY_MAX_SYMBOLS) {
+      validity.isValidityLengthHashtag = true;
+    }
+    validity.isValidityLengthHashtag = false;
+  }
+};
+
+textHashtags.addEventListener('input', function () {
+  checkSharp(transformStringToArray(textHashtags));
+  checkOnlySharp(transformStringToArray(textHashtags));
+  checkSpace(textHashtags);
+  checkDoubleHashtag(transformStringToArray(textHashtags));
+  checkQtyHashtags(transformStringToArray(textHashtags));
+  checkLengthHashtag(transformStringToArray(textHashtags));
 
   if (validity.isValiditySharp) {
-    target.setCustomValidity('Хэш-тег начинается с символа # (решётка)');
+    textHashtags.setCustomValidity('Хэш-тег начинается с символа # (решётка)');
   } else if (validity.isValidityOnlySharp) {
-    target.setCustomValidity('Хэш-тег не может состоять только из одной решётки');
+    textHashtags.setCustomValidity('Хэш-тег не может состоять только из одной решётки');
   } else if (validity.isValiditySpace) {
-    target.setCustomValidity('Хэш-теги разделяются пробелами');
+    textHashtags.setCustomValidity('Хэш-теги разделяются пробелами');
   } else if (validity.isValidityDoubleHashtag) {
-    target.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
+    textHashtags.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
   } else if (validity.isValidityQtyHashtags) {
-    target.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
+    textHashtags.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
   } else if (validity.isValidityLengthHashtag) {
-    target.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая решётку');
+    textHashtags.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая решётку');
   } else {
-    target.setCustomValidity('');
+    textHashtags.setCustomValidity('');
   }
 });
