@@ -271,11 +271,11 @@ textHashtags.addEventListener('input', function (evt) {
         validity.isValidityOnlySharp = true;
       } else if (qtySymbols.length > QTY_MAX_SYMBOLS) { // максимальная длина одного хэш-тега 20 символов, включая решётку
         validity.isValidityLengthHashtag = true;
-      }
-
-      for (var k = j + 1; k < j; k++) {
-        if (hashtagsArray[j].toLowerCase() === hashtagsArray[k].toLowerCase()) { // теги нечувствительны к регистру: #ХэшТег и #хэштег считаются одним и тем же тегом
-          validity.isValidityDoubleHashtag = true; // один и тот же хэш-тег не может быть использован дважды
+      } else {
+        for (var k = 0; k < j; k++) {
+          if (hashtagsArray[j].toLowerCase() === hashtagsArray[k].toLowerCase()) { // теги нечувствительны к регистру: #ХэшТег и #хэштег считаются одним и тем же тегом
+            validity.isValidityDoubleHashtag = true; // один и тот же хэш-тег не может быть использован дважды
+          }
         }
       }
     }
