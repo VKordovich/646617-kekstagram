@@ -128,10 +128,10 @@ var imgUploadForm = document.querySelector('.img-upload__form');
 
 var openUploadWindow = function () {
   imgUploadOverlay.classList.remove('hidden');
-  document.addEventListener('keydown', closeWindowEsc);
+  document.addEventListener('keydown', onButtonEsc);
 };
 
-var closeWindowEsc = function (evt) {
+var onButtonEsc = function (evt) {
   if (evt.keyCode === 27) {
     imgUploadOverlay.classList.add('hidden');
     imgUploadForm.reset();
@@ -243,124 +243,93 @@ var textHashtags = document.querySelector('.text__hashtags');
 var QTY_MAX_HASHTAG = 5;
 var QTY_MAX_SYMBOLS = 20;
 var QTY_MIN_SYMBOLS = 1;
-var validity = {
-  isValiditySharp: true,
-  isValidityOnlySharp: false,
-  isValiditySpace: false,
-  isValidityDoubleHashtag: false,
-  isValidityQtyHashtags: false,
-  isValidityLengthHashtag: false,
-};
-
-// преобразует строку из инпута в массив
-var transformStringToArray = function (string) {
-  var stringHashtags = string.value;
-  var receivedArray = stringHashtags.split(' ');
-  return receivedArray;
-};
 
 // хэш-тег начинается с символа # (решётка)
-var checkSharp = function (hashTagArr) {
-  var receivedArray = hashTagArr;
-  for (var j = 0; j < receivedArray.length; j++) {
-    var firstSymbol = String(receivedArray[j].split('', 1));
-    if (firstSymbol !== '#') {
-      validity.isValiditySharp = true;
-    } else {
-      validity.isValiditySharp = false;
-    }
-  }
+var checkSharp = function (str) {
+  return str[0] === '#';
 };
 
 // хеш-тег не может состоять только из одной решётки
-var checkOnlySharp = function (hashTagArr) {
-  var receivedArray = hashTagArr;
-  for (var j = 0; j < receivedArray.length; j++) {
-    var qtySymbols = receivedArray[j].split('');
-    if (qtySymbols.length < QTY_MIN_SYMBOLS) {
-      validity.isValidityOnlySharp = true;
-    } else {
-      validity.isValidityOnlySharp = false;
-    }
-  }
+var checkLength = function (str) {
+  return str.length > QTY_MIN_SYMBOLS;
+};
+
+// максимальная длина одного хэш-тега 20 символов, включая решётку
+var checkLengthHashtag = function (str) {
+  return str.length < QTY_MAX_SYMBOLS;
 };
 
 // хэш-теги разделяются пробелами
-var checkSpace = function (hashTagArr) {
-  var receivedArray = hashTagArr.value;
-  if (receivedArray.indexOf(',') > -1) {
-    validity.isValiditySpace = true;
-  } else {
-    validity.isValiditySpace = false;
-  }
+var checkSpace = function (hashTags) {
+  return hashTags.indexOf(',') > -1;
 };
 
 // один и тот же хэш-тег не может быть использован дважды
 // теги нечувствительны к регистру: #ХэшТег и #хэштег считаются одним и тем же тегом
-var checkDoubleHashtag = function (hashTagArr) {
-  var receivedArray = hashTagArr;
-  for (var j = 0; j < receivedArray.length; j++) {
-    for (var k = j + 1; k < j; k++) {
-      if (receivedArray[j].toLowerCase() === receivedArray[k].toLowerCase()) {
-        validity.isValidityDoubleHashtag = true;
-      } else {
-        validity.isValidityDoubleHashtag = false;
-      }
+var checkDoubleHashtag = function (hashTags) {
+  hashTags.sort();
+  for (var j = 0; j < hashTags.length - 1; j++) {
+    if (hashTags[j].toLowerCase() === hashTags[j + 1].toLowerCase()) {
+      return false;
     }
   }
+  return true;
 };
 
 // нельзя указать больше пяти хэш-тегов
-var checkQtyHashtags = function (hashTagArr) {
-  var receivedArray = hashTagArr;
-  if (receivedArray.length > QTY_MAX_HASHTAG) {
-    validity.isValidityQtyHashtags = true;
-  } else {
-    validity.isValidityQtyHashtags = false;
-  }
+var checkQtyHashtags = function (hashTags) {
+  return hashTags.length < QTY_MAX_HASHTAG;
 };
 
-// максимальная длина одного хэш-тега 20 символов, включая решётку
-var checkLengthHashtag = function (hashTagArr) {
-  var receivedArray = hashTagArr;
-  for (var j = 0; j < receivedArray.length; j++) {
-    var qtySymbols = receivedArray[j].split('');
-    if (qtySymbols.length > QTY_MAX_SYMBOLS) {
-      validity.isValidityLengthHashtag = true;
-    } else {
-      validity.isValidityLengthHashtag = false;
+var checkValidity = function (hashtags) {
+  var message = '';
+
+  // проверка для одиночных хештегов
+  for (var j = 0; j < hashtags.length; j++) {
+
+    if (!checkSharp(hashtags[j])) {
+      message += 'Хэш-тег должен начинаться с символа # (решётка). ';
+    }
+    if (!checkLength(hashtags[j])) {
+      message += 'Хэш-тег не может состоять только из одной решётки. ';
+    }
+    if (!checkLengthHashtag(hashtags[j])) {
+      message += 'Максимальная длина одного хэш-тега 20 символов, включая решётку. ';
+    }
+    if (checkSpace(hashtags[j])) {
+      message += 'Хэш-теги разделяются пробелами. ';
     }
   }
-};
 
-textHashtags.addEventListener('input', function () {
-  var message = '';
-  checkSharp(transformStringToArray(textHashtags));
-  checkOnlySharp(transformStringToArray(textHashtags));
-  checkSpace(textHashtags);
-  checkDoubleHashtag(transformStringToArray(textHashtags));
-  checkQtyHashtags(transformStringToArray(textHashtags));
-  checkLengthHashtag(transformStringToArray(textHashtags));
-
-  if (validity.isValiditySharp) {
-    message += ('Хэш-тег начинается с символа # (решётка)');
-  } else if (validity.isValidityOnlySharp) {
-    message += ('Хэш-тег не может состоять только из одной решётки');
-  } else if (validity.isValiditySpace) {
-    message += ('Хэш-теги разделяются пробелами');
-  } else if (validity.isValidityDoubleHashtag) {
-    message += ('Один и тот же хэш-тег не может быть использован дважды');
-  } else if (validity.isValidityQtyHashtags) {
-    message += ('Нельзя указать больше пяти хэш-тегов');
-  } else if (validity.isValidityLengthHashtag) {
-    message += ('Максимальная длина одного хэш-тега 20 символов, включая решётку');
-  } else {
-    textHashtags.setCustomValidity('');
+  // проверка для всего массива хештегов
+  if (!checkDoubleHashtag(hashtags)) {
+    message += 'Хештеги повторяются. ';
   }
 
-  if (message !== '') {
+  if (!checkQtyHashtags(hashtags)) {
+    message += 'Нельзя указать больше пяти хэш-тегов. ';
+  }
+
+  if (message) {
     textHashtags.setCustomValidity(message);
   } else {
     textHashtags.setCustomValidity('');
   }
+};
+
+textHashtags.addEventListener('input', function (evt) {
+  var hashtags = evt.target.value.split(' ');
+  checkValidity(hashtags);
+});
+
+imgUploadForm.addEventListener('submit', function () {
+  checkValidity(textHashtags.value.split(' '));
+});
+
+textHashtags.addEventListener('focus', function () {
+  document.removeEventListener('keydown', onButtonEsc);
+});
+
+textHashtags.addEventListener('blur', function () {
+  document.addEventListener('keydown', onButtonEsc);
 });
