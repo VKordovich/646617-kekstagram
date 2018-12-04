@@ -244,7 +244,7 @@ var QTY_MAX_HASHTAG = 5;
 var QTY_MAX_SYMBOLS = 20;
 var QTY_MIN_SYMBOLS = 1;
 var validity = {
-  isValiditySharp: false,
+  isValiditySharp: true,
   isValidityOnlySharp: false,
   isValiditySpace: false,
   isValidityDoubleHashtag: false,
@@ -266,8 +266,9 @@ var checkSharp = function (hashTagArr) {
     var firstSymbol = String(receivedArray[j].split('', 1));
     if (firstSymbol !== '#') {
       validity.isValiditySharp = true;
+    } else {
+      validity.isValiditySharp = false;
     }
-    validity.isValiditySharp = false;
   }
 };
 
@@ -278,8 +279,9 @@ var checkOnlySharp = function (hashTagArr) {
     var qtySymbols = receivedArray[j].split('');
     if (qtySymbols.length < QTY_MIN_SYMBOLS) {
       validity.isValidityOnlySharp = true;
+    } else {
+      validity.isValidityOnlySharp = false;
     }
-    validity.isValidityOnlySharp = false;
   }
 };
 
@@ -288,8 +290,9 @@ var checkSpace = function (hashTagArr) {
   var receivedArray = hashTagArr.value;
   if (receivedArray.indexOf(',') > -1) {
     validity.isValiditySpace = true;
+  } else {
+    validity.isValiditySpace = false;
   }
-  validity.isValiditySpace = false;
 };
 
 // один и тот же хэш-тег не может быть использован дважды
@@ -300,8 +303,9 @@ var checkDoubleHashtag = function (hashTagArr) {
     for (var k = j + 1; k < j; k++) {
       if (receivedArray[j].toLowerCase() === receivedArray[k].toLowerCase()) {
         validity.isValidityDoubleHashtag = true;
+      } else {
+        validity.isValidityDoubleHashtag = false;
       }
-      validity.isValidityDoubleHashtag = false;
     }
   }
 };
@@ -311,8 +315,9 @@ var checkQtyHashtags = function (hashTagArr) {
   var receivedArray = hashTagArr;
   if (receivedArray.length > QTY_MAX_HASHTAG) {
     validity.isValidityQtyHashtags = true;
+  } else {
+    validity.isValidityQtyHashtags = false;
   }
-  validity.isValidityQtyHashtags = false;
 };
 
 // максимальная длина одного хэш-тега 20 символов, включая решётку
@@ -322,12 +327,14 @@ var checkLengthHashtag = function (hashTagArr) {
     var qtySymbols = receivedArray[j].split('');
     if (qtySymbols.length > QTY_MAX_SYMBOLS) {
       validity.isValidityLengthHashtag = true;
+    } else {
+      validity.isValidityLengthHashtag = false;
     }
-    validity.isValidityLengthHashtag = false;
   }
 };
 
 textHashtags.addEventListener('input', function () {
+  var message = '';
   checkSharp(transformStringToArray(textHashtags));
   checkOnlySharp(transformStringToArray(textHashtags));
   checkSpace(textHashtags);
@@ -336,17 +343,23 @@ textHashtags.addEventListener('input', function () {
   checkLengthHashtag(transformStringToArray(textHashtags));
 
   if (validity.isValiditySharp) {
-    textHashtags.setCustomValidity('Хэш-тег начинается с символа # (решётка)');
+    message += ('Хэш-тег начинается с символа # (решётка)');
   } else if (validity.isValidityOnlySharp) {
-    textHashtags.setCustomValidity('Хэш-тег не может состоять только из одной решётки');
+    message += ('Хэш-тег не может состоять только из одной решётки');
   } else if (validity.isValiditySpace) {
-    textHashtags.setCustomValidity('Хэш-теги разделяются пробелами');
+    message += ('Хэш-теги разделяются пробелами');
   } else if (validity.isValidityDoubleHashtag) {
-    textHashtags.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
+    message += ('Один и тот же хэш-тег не может быть использован дважды');
   } else if (validity.isValidityQtyHashtags) {
-    textHashtags.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
+    message += ('Нельзя указать больше пяти хэш-тегов');
   } else if (validity.isValidityLengthHashtag) {
-    textHashtags.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая решётку');
+    message += ('Максимальная длина одного хэш-тега 20 символов, включая решётку');
+  } else {
+    textHashtags.setCustomValidity('');
+  }
+
+  if (message !== '') {
+    textHashtags.setCustomValidity(message);
   } else {
     textHashtags.setCustomValidity('');
   }
