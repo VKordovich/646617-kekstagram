@@ -158,6 +158,7 @@ var imgUploadPreview = imgUploadOverlay.querySelector('.img-upload__preview');
 var effectsRadio = imgUploadOverlay.querySelectorAll('.effects__radio');
 var allClassRadio = ['effects__preview--none', 'effects__preview--chrome', 'effects__preview--sepia', 'effects__preview--marvin', 'effects__preview--phobos', 'effects__preview--heat'];
 var allEffects = ['filter: none', 'filter: grayscale(1)', 'filter: sepia(1)', 'filter: invert(1)', 'filter: blur(3)', 'filter: brightness(3)'];
+effectLevelPin.classList.add('hidden');
 
 var addEffect = function (radio, classPic, effect) {
   radio.addEventListener('click', function () {
