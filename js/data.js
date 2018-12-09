@@ -6,7 +6,7 @@
   var QUANTITY_LIKES_MIN = 15;
   var QUANTITY_LIKES_MAX = 200;
   var QUANTITY_COMMENTS_MIN = 1;
-  var QUANTITY_COMMENTS_MAX = 2;
+  var QUANTITY_COMMENTS_MAX = 5;
 
   window.data = {
     generateNumber: function (min, max) { // генератор случайных чисел
