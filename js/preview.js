@@ -34,20 +34,24 @@
     return fragmentu;
   };
 
+  var createListElement = function () {
+    var myLi = document.createElement('li');
+    myLi.classList.add('social__comment');
+    myLi.appendChild(createIcon(5));
+    myLi.appendChild(createCooment(window.data.createPhoto(25)));
+    return myLi;
+  };
+
   // создание комментариев
   var createCommentsList = function (dataa) {
     removeElements(socCommentParent, socCommentUl);
     var myUl = document.createElement('ul');
-    var myLi = document.createElement('li');
-
-    var fragment = document.createDocumentFragment();
     myUl.classList.add('social__comments');
+    var fragment = document.createDocumentFragment();
 
     for (var i = 0; i < dataa; i++) {
-      myLi.classList.add('social__comment');
-      myLi.appendChild(createIcon(5));
-      myLi.appendChild(createCooment(window.data.createPhoto(25)));
-      fragment.appendChild(myLi);
+      var liOn = createListElement();
+      fragment.appendChild(liOn);
     }
 
     myUl.appendChild(fragment);
