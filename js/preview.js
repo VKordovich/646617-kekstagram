@@ -4,47 +4,45 @@
   var socCommentParent = document.querySelector('.social');
   var socCommentUl = document.querySelector('.social__comments');
 
-  // удаление каждого комментария
-  var removeElements = function (parent, child) {
-    parent.removeChild(child);
-  };
-
   var createCooment = function (data) {
     var myP = document.createElement('p');
-    var fragmente = document.createDocumentFragment();
+    var fragment = document.createDocumentFragment();
     for (var i = 0; i < data[1].comments.length; i++) {
       myP.classList.add('social__text');
       myP.textContent = data[1].comments[i];
-      fragmente.appendChild(myP);
+      fragment.appendChild(myP);
     }
-    return fragmente;
+    return fragment;
   };
 
   var createIcon = function (data) {
     var myImg = document.createElement('img');
-    var fragmentu = document.createDocumentFragment();
+    var fragment = document.createDocumentFragment();
     for (var i = 0; i < data; i++) {
       myImg.classList.add('social__picture');
       myImg.src = 'img/avatar-' + window.data.generateNumber(1, 6) + '.svg';
       myImg.alt = 'Аватар комментатора фотографии';
       myImg.width = 35;
       myImg.height = 35;
-      fragmentu.appendChild(myImg);
+      fragment.appendChild(myImg);
     }
-    return fragmentu;
+    return fragment;
   };
 
   var createListElement = function () {
+    var QTY_COMMENTS = 5;
     var myLi = document.createElement('li');
     myLi.classList.add('social__comment');
-    myLi.appendChild(createIcon(5));
+    myLi.appendChild(createIcon(QTY_COMMENTS));
     myLi.appendChild(createCooment(window.data.createPhoto(25)));
     return myLi;
   };
 
   // создание комментариев
   var createCommentsList = function (dataa) {
-    removeElements(socCommentParent, socCommentUl);
+    while (socCommentUl.firstChild) {
+      socCommentUl.removeChild(socCommentUl.firstChild);
+    }
     var myUl = document.createElement('ul');
     myUl.classList.add('social__comments');
     var fragment = document.createDocumentFragment();
