@@ -1,7 +1,5 @@
 'use strict';
 (function () {
-
-  var socCommentParent = document.querySelector('.social');
   var socCommentUl = document.querySelector('.social__comments');
 
   var createCooment = function (data) {
@@ -43,17 +41,13 @@
     while (socCommentUl.firstChild) {
       socCommentUl.removeChild(socCommentUl.firstChild);
     }
-    var myUl = document.createElement('ul');
-    myUl.classList.add('social__comments');
     var fragment = document.createDocumentFragment();
 
     for (var i = 0; i < dataa; i++) {
       var liOn = createListElement();
       fragment.appendChild(liOn);
     }
-
-    myUl.appendChild(fragment);
-    return socCommentParent.insertBefore(myUl, socCommentParent.children[2]);
+    socCommentUl.appendChild(fragment);
   };
 
   window.preview = {
