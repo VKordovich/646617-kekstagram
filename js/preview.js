@@ -32,25 +32,14 @@
   };
   var fragment = document.createDocumentFragment();
 
-  // ОЧЕНЬ ХИТРЫЙ ХОД..................................................................
   // more 5 comm
-  var createMoreComments = function (comments) {
-    for (var i = 0; i < QTY_COMMENTS; i++) {
+  var createMoreComments = function (comments, qty) {
+    for (var i = 0; i < qty; i++) {
       var liOn = createListElement(comments[i]);
       fragment.appendChild(liOn);
     }
     return fragment;
   };
-
-  // less 5 comm
-  var createLessComments = function (comments) {
-    for (var i = 0; i < comments.length; i++) {
-      var liOn = createListElement(comments[i]);
-      fragment.appendChild(liOn);
-    }
-    return fragment;
-  };
-  // ОЧЕНЬ ХИТРЫЙ ХОД..................................................................
 
   // создание комментариев
   var createCommentsList = function (data) {
@@ -58,9 +47,9 @@
       socCommentUl.removeChild(socCommentUl.firstChild);
     }
     if (data.length < 5) {
-      createLessComments(data);
+      createMoreComments(data, data.length);
     } else {
-      createMoreComments(data);
+      createMoreComments(data, QTY_COMMENTS);
     }
     socCommentUl.appendChild(fragment);
   };
