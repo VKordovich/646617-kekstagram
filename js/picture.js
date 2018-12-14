@@ -2,7 +2,7 @@
 (function () {
   var pictureElementTemplate = document.querySelector('#picture').content.querySelector('.picture');
   var bigPictureCancel = document.querySelector('.big-picture__cancel');
-
+  var QTY_PHOTOS = 25;
   var allPhotos = document.querySelector('.pictures');
   var openBigPicture = function () {
     window.preview.bigPictureElement.classList.remove('hidden');
@@ -34,12 +34,26 @@
   };
 
   // отрисовка элементов
-  var renderBlockElements = function (quantity) {
+  var onLoad = function (picture) {
     var fragment = document.createDocumentFragment();
-    for (var j = 1; j <= quantity; j++) {
-      fragment.appendChild(renderPictureElement(window.data.createPhoto(window.preview.QUANTITY_PHOTOS)[j]));
+    for (var j = 0; j < QTY_PHOTOS; j++) {
+      fragment.appendChild(renderPictureElement(picture[j]));
     }
-    return allPhotos.appendChild(fragment);
+    allPhotos.appendChild(fragment);
   };
-  renderBlockElements(window.preview.QUANTITY_PHOTOS);
+
+
+  var onErrorLoad = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red; width: 1000px; min-height: 100px; padding-top: 20px;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '60px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  window.backend.load(onLoad, onErrorLoad);
 })();
