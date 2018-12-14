@@ -1,7 +1,7 @@
 'use strict';
 (function () {
   var socCommentUl = document.querySelector('.social__comments');
-
+  var QTY_COMMENTS = 5;
   var createCooment = function (data) {
     var myP = document.createElement('p');
     var fragment = document.createDocumentFragment();
@@ -30,17 +30,37 @@
     myLi.appendChild(createCooment(comment));
     return myLi;
   };
+  var fragment = document.createDocumentFragment();
+
+  // ОЧЕНЬ ХИТРЫЙ ХОД..................................................................
+  // more 5 comm
+  var createMoreComments = function (comments) {
+    for (var i = 0; i < QTY_COMMENTS; i++) {
+      var liOn = createListElement(comments[i]);
+      fragment.appendChild(liOn);
+    }
+    return fragment;
+  };
+
+  // less 5 comm
+  var createLessComments = function (comments) {
+    for (var i = 0; i < comments.length; i++) {
+      var liOn = createListElement(comments[i]);
+      fragment.appendChild(liOn);
+    }
+    return fragment;
+  };
+  // ОЧЕНЬ ХИТРЫЙ ХОД..................................................................
 
   // создание комментариев
   var createCommentsList = function (data) {
     while (socCommentUl.firstChild) {
       socCommentUl.removeChild(socCommentUl.firstChild);
     }
-    var fragment = document.createDocumentFragment();
-
-    for (var i = 0; i < 5; i++) {
-      var liOn = createListElement(data[i]);
-      fragment.appendChild(liOn);
+    if (data.length < 5) {
+      createLessComments(data);
+    } else {
+      createMoreComments(data);
     }
     socCommentUl.appendChild(fragment);
   };
