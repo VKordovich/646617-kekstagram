@@ -2,8 +2,11 @@
 (function () {
   var pictureElementTemplate = document.querySelector('#picture').content.querySelector('.picture');
   var bigPictureCancel = document.querySelector('.big-picture__cancel');
-
+  var QTY_PHOTOS = 25;
   var allPhotos = document.querySelector('.pictures');
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
+  var main = document.querySelector('main');
+
   var openBigPicture = function () {
     window.preview.bigPictureElement.classList.remove('hidden');
     document.addEventListener('keydown', function (evt) {
@@ -34,12 +37,19 @@
   };
 
   // отрисовка элементов
-  var renderBlockElements = function (quantity) {
+  var onLoad = function (picture) {
     var fragment = document.createDocumentFragment();
-    for (var j = 1; j <= quantity; j++) {
-      fragment.appendChild(renderPictureElement(window.data.createPhoto(window.preview.QUANTITY_PHOTOS)[j]));
+    for (var j = 0; j < QTY_PHOTOS; j++) {
+      fragment.appendChild(renderPictureElement(picture[j]));
     }
-    return allPhotos.appendChild(fragment);
+    allPhotos.appendChild(fragment);
   };
-  renderBlockElements(window.preview.QUANTITY_PHOTOS);
+
+
+  var onErrorLoad = function () {
+    var errorWindow = errorTemplate.cloneNode(true);
+    main.insertAdjacentElement('afterbegin', errorWindow);
+  };
+
+  window.backend.load(onLoad, onErrorLoad);
 })();

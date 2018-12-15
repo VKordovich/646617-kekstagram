@@ -62,6 +62,28 @@
     imgUploadOverlay.classList.remove('hidden');
     document.addEventListener('keydown', onButtonEsc);
   };
+
+  // eslint-disable-next-line no-unused-vars
+  var onLoadToServer = function (response) {
+    imgUploadOverlay.classList.add('hidden');
+  };
+
+  var onErrorLoad = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red; width: 1000px; min-height: 100px; padding-top: 20px;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '60px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  imgUploadForm.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(imgUploadForm), onLoadToServer, onErrorLoad);
+    evt.preventDefault();
+  });
   // ......................................................................................................................................................................................
   var onButtonEsc = function (evt) {
     if (evt.keyCode === 27) {
