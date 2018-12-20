@@ -12,7 +12,9 @@
   var buttonNew = document.getElementById('filter-new');
   var buttonDiscussed = document.getElementById('filter-discussed');
   var photosFromServer = [];
-  var copyPhotos = [];
+  var copyPhotosDis = [];
+  var copyPhotosNew = [];
+  var QTY_NEW_PHOTO = 10;
 
   var openBigPicture = function () {
     window.preview.bigPictureElement.classList.remove('hidden');
@@ -44,8 +46,8 @@
   };
 
   // формирование списка фото
-  var renderPhotos = function (picture) {
-    var takeNumber = picture.length;
+  var renderPhotos = function (picture, num) {
+    var takeNumber = num;
     allPhotos.innerHTML = '';
     allPhotos.appendChild(imgUpl);
     for (var i = 0; i < takeNumber; i++) {
@@ -54,51 +56,44 @@
   };
 
   buttonPopular.addEventListener('click', function () {
-    renderPhotos(photosFromServer);
+    renderPhotos(photosFromServer, photosFromServer.length);
     buttonPopular.classList.add('img-filters__button--active');
     buttonNew.classList.remove('img-filters__button--active');
     buttonDiscussed.classList.remove('img-filters__button--active');
   });
   buttonNew.addEventListener('click', function () {
-    sortNewPhotos(photosFromServer, 10);
+    sortNewPhotos(copyPhotosNew, 10);
     buttonNew.classList.add('img-filters__button--active');
     buttonPopular.classList.remove('img-filters__button--active');
     buttonDiscussed.classList.remove('img-filters__button--active');
   });
   buttonDiscussed.addEventListener('click', function () {
-    sortDiscussedPhoto(copyPhotos);
+    sortDiscussedPhoto(copyPhotosDis);
     buttonDiscussed.classList.add('img-filters__button--active');
     buttonPopular.classList.remove('img-filters__button--active');
     buttonNew.classList.remove('img-filters__button--active');
   });
 
-  var sortNewPhotos = function (photos, n) {
-    var result = [];
-    var taken = [];
-    var len = photos.length;
-    if (n > len) {
-      throw new RangeError('Зачем так много?');
-    }
-    while (n--) {
-      var x = Math.floor(Math.random() * len);
-      result[n] = photos[x in taken ? taken[x] : x];
-      taken[x] = --len;
-    }
-    renderPhotos(result);
+  var sortNewPhotos = function (photos) {
+    var compareRandom = function () {
+      return Math.random() - 0.5;
+    };
+    renderPhotos(photos.sort(compareRandom), QTY_NEW_PHOTO);
   };
 
   var sortDiscussedPhoto = function (photos) {
     photos.sort(function (a, b) {
       return b.comments.length - a.comments.length;
     });
-    renderPhotos(photos);
+    renderPhotos(photos, photos.length);
   };
 
   // отрисовка элементов
   var onLoad = function (picture) {
     photosFromServer = picture;
-    copyPhotos = photosFromServer.slice();
-    renderPhotos(photosFromServer);
+    copyPhotosDis = photosFromServer.slice();
+    copyPhotosNew = photosFromServer.slice();
+    renderPhotos(photosFromServer, photosFromServer.length);
   };
 
 
