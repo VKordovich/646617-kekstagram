@@ -2,10 +2,17 @@
 (function () {
   var pictureElementTemplate = document.querySelector('#picture').content.querySelector('.picture');
   var bigPictureCancel = document.querySelector('.big-picture__cancel');
-  var QTY_PHOTOS = 25;
   var allPhotos = document.querySelector('.pictures');
+  var imgUpl = allPhotos.querySelector('.img-upload');
   var errorTemplate = document.querySelector('#error').content.querySelector('.error');
   var main = document.querySelector('main');
+  var imgFilters = document.querySelector('.img-filters');
+  imgFilters.classList.remove('img-filters--inactive');
+  var buttonPopular = document.getElementById('filter-popular');
+  var buttonNew = document.getElementById('filter-new');
+  var buttonDiscussed = document.getElementById('filter-discussed');
+  var photosFromServer = [];
+  var copyPhotos = [];
 
   var openBigPicture = function () {
     window.preview.bigPictureElement.classList.remove('hidden');
@@ -22,8 +29,8 @@
   bigPictureCancel.addEventListener('click', function () {
     closeBigPicture();
   });
-  // создание DOM элемента
 
+  // создание DOM элемента
   var renderPictureElement = function (pic) {
     var pictureElement = pictureElementTemplate.cloneNode(true);
     pictureElement.querySelector('.picture__img').src = pic.url;
@@ -36,13 +43,62 @@
     return pictureElement;
   };
 
+  // формирование списка фото
+  var renderPhotos = function (picture) {
+    var takeNumber = picture.length;
+    allPhotos.innerHTML = '';
+    allPhotos.appendChild(imgUpl);
+    for (var i = 0; i < takeNumber; i++) {
+      allPhotos.appendChild(renderPictureElement(picture[i]));
+    }
+  };
+
+  buttonPopular.addEventListener('click', function () {
+    renderPhotos(photosFromServer);
+    buttonPopular.classList.add('img-filters__button--active');
+    buttonNew.classList.remove('img-filters__button--active');
+    buttonDiscussed.classList.remove('img-filters__button--active');
+  });
+  buttonNew.addEventListener('click', function () {
+    sortNewPhotos(photosFromServer, 10);
+    buttonNew.classList.add('img-filters__button--active');
+    buttonPopular.classList.remove('img-filters__button--active');
+    buttonDiscussed.classList.remove('img-filters__button--active');
+  });
+  buttonDiscussed.addEventListener('click', function () {
+    sortDiscussedPhoto(copyPhotos);
+    buttonDiscussed.classList.add('img-filters__button--active');
+    buttonPopular.classList.remove('img-filters__button--active');
+    buttonNew.classList.remove('img-filters__button--active');
+  });
+
+  var sortNewPhotos = function (photos, n) {
+    var result = [];
+    var taken = [];
+    var len = photos.length;
+    if (n > len) {
+      throw new RangeError('Зачем так много?');
+    }
+    while (n--) {
+      var x = Math.floor(Math.random() * len);
+      result[n] = photos[x in taken ? taken[x] : x];
+      taken[x] = --len;
+    }
+    renderPhotos(result);
+  };
+
+  var sortDiscussedPhoto = function (photos) {
+    photos.sort(function (a, b) {
+      return b.comments.length - a.comments.length;
+    });
+    renderPhotos(photos);
+  };
+
   // отрисовка элементов
   var onLoad = function (picture) {
-    var fragment = document.createDocumentFragment();
-    for (var j = 0; j < QTY_PHOTOS; j++) {
-      fragment.appendChild(renderPictureElement(picture[j]));
-    }
-    allPhotos.appendChild(fragment);
+    photosFromServer = picture;
+    copyPhotos = photosFromServer.slice();
+    renderPhotos(photosFromServer);
   };
 
 
