@@ -54,14 +54,14 @@
       socCommentUl.querySelector('li.visually-hidden').classList.remove('visually-hidden');
       qtyComments--;
       qtyData--;
-    };
+    }
   };
   var countCurr = function (a) {
     if (a > 3) {
       return a;
     }
     return ++a;
-   };
+  };
   window.preview = {
     bigPictureElement: document.querySelector('.big-picture'),
     renderBigPictureElement: function (bigPic) {
@@ -70,7 +70,7 @@
       window.preview.bigPictureElement.querySelector('.comments-count').textContent = bigPic.comments.length;
       window.preview.bigPictureElement.querySelector('.social__caption').textContent = bigPic.description;
       createCommentsList(bigPic.comments, QTY_COMMENTS);
-      socCommentsLoader.addEventListener('click', function (evt) {
+      socCommentsLoader.addEventListener('click', function () {
         CONSTCOMM = countCurr(CONSTCOMM);
         createCommentsList(bigPic.comments, QTY_COMMENTS * CONSTCOMM);
       });
