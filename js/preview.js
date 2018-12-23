@@ -4,6 +4,8 @@
   var QTY_COMMENTS = 5;
   var CONSTCOMM = 1;
   var socCommentsLoader = document.querySelector('.social__comments-loader');
+  var socCommCount = document.querySelector('.social__comment-count');
+
   var createCooment = function (data) {
     var myP = document.createElement('p');
     var fragment = document.createDocumentFragment();
@@ -49,19 +51,25 @@
     while (socCommentUl.firstChild) {
       socCommentUl.removeChild(socCommentUl.firstChild);
     }
-    createMoreComments(data, data.length);
+    createMoreComments(data, qtyData);
     while (qtyComments && qtyData) {
       socCommentUl.querySelector('li.visually-hidden').classList.remove('visually-hidden');
       qtyComments--;
       qtyData--;
     }
+    if (!qtyData) {
+      socCommentsLoader.classList.add('visually-hidden');
+    }
+    socCommCount.innerHTML = data.length - qtyData + ' из <span class="comments-count">' + data.length + '</span> комментариев';
   };
+
   var countCurr = function (a) {
     if (a > 3) {
       return a;
     }
     return ++a;
   };
+
   window.preview = {
     bigPictureElement: document.querySelector('.big-picture'),
     renderBigPictureElement: function (bigPic) {
