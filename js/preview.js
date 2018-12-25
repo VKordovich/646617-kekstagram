@@ -59,11 +59,19 @@
     }
     if (!qtyData) {
       socCommentsLoader.classList.add('visually-hidden');
+    } else {
+      if (socCommentsLoader.classList.contains('visually-hidden')) {
+        socCommentsLoader.classList.remove('visually-hidden');
+      }
     }
-    socCommCount.innerHTML = data.length - qtyData + ' из <span class="comments-count">' + data.length + '</span> комментариев';
+    socCommCount.innerHTML = '';
+     var newSpan = document.createElement('span');
+     newSpan.classList.add('comments-count');
+     newSpan.textContent = data.length - qtyData + ' из ' + data.length + ' комментариев';
+     socCommCount.insertBefore(newSpan, socCommCount.firstChild);
   };
 
-  var countCurr = function (a) {
+  var calculateClicks = function (a) {
     if (a > 3) {
       return a;
     }
@@ -79,7 +87,7 @@
       window.preview.bigPictureElement.querySelector('.social__caption').textContent = bigPic.description;
       createCommentsList(bigPic.comments, QTY_COMMENTS);
       socCommentsLoader.addEventListener('click', function () {
-        CONSTCOMM = countCurr(CONSTCOMM);
+        CONSTCOMM = calculateClicks(CONSTCOMM);
         createCommentsList(bigPic.comments, QTY_COMMENTS * CONSTCOMM);
       });
       return window.preview.bigPictureElement;

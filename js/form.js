@@ -19,12 +19,15 @@
   var scaleControlValue = imgUploadOverlay.querySelector('.scale__control--value').getAttribute('value');
   var scaleControlValueMonitor = imgUploadOverlay.querySelector('.scale__control--value');
   var textHashtags = document.querySelector('.text__hashtags');
+  var textDescription = document.querySelector('.text__description');
   var SCALE_STEP = 25;
   var MIN_SCALE = 25;
   var MAX_SCALE = 100;
   var QTY_MAX_HASHTAG = 5;
   var QTY_MAX_SYMBOLS = 20;
   var QTY_MIN_SYMBOLS = 1;
+  var QTY_MAX_COMMENT = 140;
+  var imgUploadText = document.querySelector('.img-upload__text');
   var effects = [
     {
       name: 'chrome',
@@ -259,6 +262,19 @@
     return hashTags.length < QTY_MAX_HASHTAG;
   };
 
+  var checkLengthComment = function (comm) {
+    return comm.length < QTY_MAX_COMMENT;
+  };
+
+  // выводит сообщение об ошибке
+  var setMessage = function (currentInput, message) {
+    if (message) {
+      currentInput.setCustomValidity(message);
+    } else {
+      currentInput.setCustomValidity('');
+    }
+  };
+
   var checkValidity = function (hashtags) {
     var message = '';
 
@@ -287,28 +303,37 @@
     if (!checkQtyHashtags(hashtags)) {
       message += 'Нельзя указать больше пяти хэш-тегов. ';
     }
-
-    if (message) {
-      textHashtags.setCustomValidity(message);
-    } else {
-      textHashtags.setCustomValidity('');
-    }
+    setMessage(textHashtags, message);
   };
 
-  textHashtags.addEventListener('input', function (evt) {
-    var hashtags = evt.target.value.split(' ');
-    checkValidity(hashtags);
+  var checkValidityComment = function (comment) {
+    var alertMessage = '';
+    if (!checkLengthComment(comment)) {
+      alertMessage += 'Максимальная длина одного комментария 140 символов';
+    }
+    setMessage(textDescription, alertMessage);
+  };
+
+  imgUploadText.addEventListener('input', function (evt) {
+    if (evt.target.className === 'text__hashtags') {
+      checkValidity(evt.target.value.split(' '));
+    }
+    if (evt.target.className === 'text__description') {
+      checkValidityComment(evt.target.value.split(''));
+    }
   });
+
+  imgUploadText.addEventListener('focus', function () {
+    document.removeEventListener('keydown', onButtonEsc);
+  }, true);
+
+  imgUploadText.addEventListener('blur', function () {
+    document.addEventListener('keydown', onButtonEsc);
+  }, true);
 
   imgUploadForm.addEventListener('submit', function () {
     checkValidity(textHashtags.value.split(' '));
-  });
-
-  textHashtags.addEventListener('focus', function () {
-    document.removeEventListener('keydown', onButtonEsc);
-  });
-
-  textHashtags.addEventListener('blur', function () {
-    document.addEventListener('keydown', onButtonEsc);
+    checkValidityComment(textDescription.value.split(''));
+    imgUploadForm.reset();
   });
 })();
