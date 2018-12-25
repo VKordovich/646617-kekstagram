@@ -100,7 +100,7 @@
   };
 
 
-  var onErrorLoad = function () {
+  window.onErrorLoad = function () {
     var errorWindow = errorTemplate.cloneNode(true);
     main.insertAdjacentElement('afterbegin', errorWindow);
   };

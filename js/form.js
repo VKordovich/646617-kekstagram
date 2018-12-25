@@ -28,6 +28,9 @@
   var QTY_MIN_SYMBOLS = 1;
   var QTY_MAX_COMMENT = 140;
   var imgUploadText = document.querySelector('.img-upload__text');
+  var successTemplate = document.querySelector('#success').content.querySelector('.success');
+  var main = document.querySelector('main');
+  var successUpload;
   var effects = [
     {
       name: 'chrome',
@@ -62,41 +65,43 @@
   ];
 
   var openUploadWindow = function () {
-    imgUploadOverlay.classList.remove('hidden');
+    imgUploadOverlay.classList.remove('visually-hidden');
     document.addEventListener('keydown', onButtonEsc);
   };
 
   // eslint-disable-next-line no-unused-vars
   var onLoadToServer = function (response) {
-    imgUploadOverlay.classList.add('hidden');
-  };
-
-  var onErrorLoad = function (errorMessage) {
-    var node = document.createElement('div');
-    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red; width: 1000px; min-height: 100px; padding-top: 20px;';
-    node.style.position = 'absolute';
-    node.style.left = 0;
-    node.style.right = 0;
-    node.style.fontSize = '60px';
-
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', node);
+    imgUploadOverlay.classList.add('visually-hidden');
+    successUpload = successTemplate.cloneNode(true);
+    console.log(successUpload);
+    var successButton = successUpload.querySelector('.success__button');
+    successButton.addEventListener('click', function () {
+      closeUploadWindow(successUpload);
+    });
+    successUpload.addEventListener('keydown', onButtonEsc);
+    main.insertAdjacentElement('afterbegin', successUpload);
   };
 
   imgUploadForm.addEventListener('submit', function (evt) {
-    window.backend.save(new FormData(imgUploadForm), onLoadToServer, onErrorLoad);
+    window.backend.save(new FormData(imgUploadForm), onLoadToServer, window.onErrorLoad);
+    checkValidity(textHashtags.value.split(' '));
+    checkValidityComment(textDescription.value.split(''));
+    imgUploadForm.reset();
     evt.preventDefault();
   });
   // ......................................................................................................................................................................................
   var onButtonEsc = function (evt) {
     if (evt.keyCode === 27) {
-      imgUploadOverlay.classList.add('hidden');
+      imgUploadOverlay.classList.add('visually-hidden');
+      if (successUpload) {
+        successUpload.classList.add('visually-hidden');
+      }
       imgUploadForm.reset();
     }
   };
 
-  var closeUploadWindow = function () {
-    imgUploadOverlay.classList.add('hidden');
+  var closeUploadWindow = function (window) {
+    window.classList.add('visually-hidden');
     imgUploadForm.reset();
   };
 
@@ -105,7 +110,7 @@
   });
 
   imgCloseButton.addEventListener('click', function () {
-    closeUploadWindow();
+    closeUploadWindow(imgUploadOverlay);
   });
   // ......................................................................................................................................................................................
   // Применение эффекта для изображения
@@ -330,10 +335,4 @@
   imgUploadText.addEventListener('blur', function () {
     document.addEventListener('keydown', onButtonEsc);
   }, true);
-
-  imgUploadForm.addEventListener('submit', function () {
-    checkValidity(textHashtags.value.split(' '));
-    checkValidityComment(textDescription.value.split(''));
-    imgUploadForm.reset();
-  });
 })();
