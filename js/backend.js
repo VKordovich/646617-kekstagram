@@ -1,6 +1,5 @@
 'use strict';
 (function () {
-
   var LOAD_URL = 'https://js.dump.academy/kekstagram/data';
   var SAVE_URL = 'https://js.dump.academy/kekstagram';
   var setup = function (xhr, onLoad, onError) {

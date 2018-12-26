@@ -1,7 +1,12 @@
 'use strict';
 (function () {
-  var socCommentUl = document.querySelector('.social__comments');
+  var socialCommentUl = document.querySelector('.social__comments');
   var QTY_COMMENTS = 5;
+  var CONSTCOMM = 1;
+  var QTY_PUSH_BUTTON = 3;
+  var socialCommentsLoader = document.querySelector('.social__comments-loader');
+  var socialCommCount = document.querySelector('.social__comment-count');
+
   var createCooment = function (data) {
     var myP = document.createElement('p');
     var fragment = document.createDocumentFragment();
@@ -25,33 +30,48 @@
 
   var createListElement = function (comment) {
     var myLi = document.createElement('li');
-    myLi.classList.add('social__comment');
+    myLi.classList.add('social__comment', 'visually-hidden');
     myLi.appendChild(createIcon(comment));
     myLi.appendChild(createCooment(comment));
     return myLi;
   };
-  var fragment = document.createDocumentFragment();
 
-  // more 5 comm
   var createMoreComments = function (comments, qty) {
-    for (var i = 0; i < qty; i++) {
-      var liOn = createListElement(comments[i]);
-      fragment.appendChild(liOn);
+    var takeNumber = qty;
+    socialCommentUl.innerHTML = '';
+    for (var i = 0; i < takeNumber; i++) {
+      socialCommentUl.appendChild(createListElement(comments[i]));
     }
-    return fragment;
   };
 
-  // создание комментариев
-  var createCommentsList = function (data) {
-    while (socCommentUl.firstChild) {
-      socCommentUl.removeChild(socCommentUl.firstChild);
+  var createCommentsList = function (data, defQtyComm) {
+    var qtyComments = defQtyComm;
+    var qtyData = data.length;
+    while (socialCommentUl.firstChild) {
+      socialCommentUl.removeChild(socialCommentUl.firstChild);
     }
-    if (data.length < 5) {
-      createMoreComments(data, data.length);
+    createMoreComments(data, qtyData);
+    while (qtyComments && qtyData) {
+      socialCommentUl.querySelector('li.visually-hidden').classList.remove('visually-hidden');
+      qtyComments--;
+      qtyData--;
+    }
+    if (!qtyData) {
+      socialCommentsLoader.classList.add('visually-hidden');
     } else {
-      createMoreComments(data, QTY_COMMENTS);
+      if (socialCommentsLoader.classList.contains('visually-hidden')) {
+        socialCommentsLoader.classList.remove('visually-hidden');
+      }
     }
-    socCommentUl.appendChild(fragment);
+    socialCommCount.innerHTML = '';
+    var newSpan = document.createElement('span');
+    newSpan.classList.add('comments-count');
+    newSpan.textContent = data.length - qtyData + ' из ' + data.length + ' комментариев';
+    socialCommCount.insertBefore(newSpan, socialCommCount.firstChild);
+  };
+
+  var calculateClicks = function (a) {
+    return a > QTY_PUSH_BUTTON ? a : ++a;
   };
 
   window.preview = {
@@ -61,12 +81,12 @@
       window.preview.bigPictureElement.querySelector('.likes-count').textContent = bigPic.likes;
       window.preview.bigPictureElement.querySelector('.comments-count').textContent = bigPic.comments.length;
       window.preview.bigPictureElement.querySelector('.social__caption').textContent = bigPic.description;
-      createCommentsList(bigPic.comments);
+      createCommentsList(bigPic.comments, QTY_COMMENTS);
+      socialCommentsLoader.addEventListener('click', function () {
+        CONSTCOMM = calculateClicks(CONSTCOMM);
+        createCommentsList(bigPic.comments, QTY_COMMENTS * CONSTCOMM);
+      });
       return window.preview.bigPictureElement;
     }
   };
-
-  // отрисовка большой фотографии
-  document.querySelector('.social__comment-count').classList.add('visually-hidden');
-  document.querySelector('.comments-loader').classList.add('visually-hidden');
 })();
