@@ -4,8 +4,6 @@
   var bigPictureCancel = document.querySelector('.big-picture__cancel');
   var allPhotos = document.querySelector('.pictures');
   var imgUpl = allPhotos.querySelector('.img-upload');
-  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
-  var main = document.querySelector('main');
   var imgFilters = document.querySelector('.img-filters');
   var buttons = document.querySelectorAll('.img-filters__button');
   var photosFromServer = [];
@@ -100,10 +98,17 @@
   };
 
 
-  window.onErrorLoad = function () {
-    var errorWindow = errorTemplate.cloneNode(true);
-    main.insertAdjacentElement('afterbegin', errorWindow);
+  var onErrorLoad = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red; width: 1000px; min-height: 100px; padding-top: 20px;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '60px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
   };
 
-  window.backend.load(onLoad, window.onErrorLoad);
+  window.backend.load(onLoad, onErrorLoad);
 })();

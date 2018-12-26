@@ -14,9 +14,10 @@
   var effectLevelLine = document.querySelector('.effect-level__line');
   var effectLevelDepth = effectLevelLine.querySelector('.effect-level__depth');
   var effectLevelValue = imgUploadOverlay.querySelector('.effect-level__value');
-  var scaleControlSmaller = imgUploadOverlay.querySelector('.scale__control--smaller');
-  var scaleControlBigger = imgUploadOverlay.querySelector('.scale__control--bigger');
+  var imgUploadScale = document.querySelector('.img-upload__scale');
   var scaleControlValue = imgUploadOverlay.querySelector('.scale__control--value').getAttribute('value');
+  // var scaleControlSmaller = imgUploadOverlay.querySelector('.scale__control--smaller');
+  // var scaleControlBigger = imgUploadOverlay.querySelector('.scale__control--bigger');
   var scaleControlValueMonitor = imgUploadOverlay.querySelector('.scale__control--value');
   var textHashtags = document.querySelector('.text__hashtags');
   var textDescription = document.querySelector('.text__description');
@@ -29,8 +30,10 @@
   var QTY_MAX_COMMENT = 140;
   var imgUploadText = document.querySelector('.img-upload__text');
   var successTemplate = document.querySelector('#success').content.querySelector('.success');
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
   var main = document.querySelector('main');
   var successUpload;
+  var errorUpload;
   var effects = [
     {
       name: 'chrome',
@@ -69,20 +72,35 @@
     document.addEventListener('keydown', onButtonEsc);
   };
 
+  var appendListener = function (nameWindow, varWindow) {
+    varWindow.addEventListener('click', function (evt) {
+      if (evt.target.className === nameWindow && evt.target.className !== nameWindow + '__inner') {
+        closeUploadWindow(varWindow);
+      }
+      if (evt.target.className === nameWindow + '__button') {
+        closeUploadWindow(varWindow);
+      }
+    });
+    varWindow.addEventListener('keydown', onButtonEsc);
+  };
+
   // eslint-disable-next-line no-unused-vars
-  var onLoadToServer = function (response) {
+  var onLoadToServer = function () {
     imgUploadOverlay.classList.add('visually-hidden');
     successUpload = successTemplate.cloneNode(true);
-    var successButton = successUpload.querySelector('.success__button');
-    successButton.addEventListener('click', function () {
-      closeUploadWindow(successUpload);
-    });
-    successUpload.addEventListener('keydown', onButtonEsc);
+    appendListener('success', successUpload);
     main.insertAdjacentElement('afterbegin', successUpload);
   };
 
+  var onErrorToServer = function () {
+    imgUploadOverlay.classList.add('visually-hidden');
+    errorUpload = errorTemplate.cloneNode(true);
+    appendListener('error', errorUpload);
+    main.insertAdjacentElement('afterbegin', errorUpload);
+  };
+
   imgUploadForm.addEventListener('submit', function (evt) {
-    window.backend.save(new FormData(imgUploadForm), onLoadToServer, window.onErrorLoad);
+    window.backend.save(new FormData(imgUploadForm), onLoadToServer, onErrorToServer);
     checkValidity(textHashtags.value.split(' '));
     checkValidityComment(textDescription.value.split(''));
     imgUploadForm.reset();
@@ -99,8 +117,8 @@
     }
   };
 
-  var closeUploadWindow = function (window) {
-    window.classList.add('visually-hidden');
+  var closeUploadWindow = function (win) {
+    win.classList.add('visually-hidden');
     imgUploadForm.reset();
   };
 
@@ -196,37 +214,44 @@
   effectLevelPin.addEventListener('mousedown', onPinMouseDown);
 
   // .........................Редактирование размера изображения
-
   var decreaseScale = function () {
     if (parseFloat(scaleControlValue) !== MIN_SCALE) {
-      var currentValue = parseFloat(scaleControlValue) - SCALE_STEP + '%';
-      scaleControlValueMonitor.setAttribute('value', currentValue);
-      imgUploadPreview.querySelector('img').style.transform = 'scale(0.75)';
+      var currentValue = parseFloat(scaleControlValue) - SCALE_STEP;
+      scaleControlValueMonitor.setAttribute('value', currentValue + '%');
+      imgUploadPreview.querySelector('img').style.transform = 'scale(0.' + currentValue + ')';
+      scaleControlValue = currentValue;
     } else {
       currentValue = parseFloat(scaleControlValue);
       imgUploadPreview.querySelector('img').style.transform = 'scale(0.25)';
+      scaleControlValue = currentValue;
     }
   };
 
   var increaseScale = function () {
     if (parseFloat(scaleControlValue) !== MAX_SCALE) {
-      var currentValue = parseFloat(scaleControlValue) + SCALE_STEP + '%';
-      scaleControlValueMonitor.setAttribute('value', currentValue);
-      imgUploadPreview.querySelector('img').style.transform = 'scale(0.' + currentValue + ')'; // в таком формате не работает
+      var currentValue = parseFloat(scaleControlValue) + SCALE_STEP;
+      scaleControlValueMonitor.setAttribute('value', currentValue + '%');
+      imgUploadPreview.querySelector('img').style.transform = 'scale(0.' + currentValue + ')';
+      if (currentValue === 100) {
+        imgUploadPreview.querySelector('img').style.transform = 'scale(1)';
+      }
+      scaleControlValue = currentValue;
     } else {
       currentValue = parseFloat(scaleControlValue);
       imgUploadPreview.querySelector('img').style.transform = 'scale(1)';
+      scaleControlValue = currentValue;
     }
   };
 
-  scaleControlSmaller.addEventListener('click', function () {
-    decreaseScale();
-  });
+  imgUploadScale.addEventListener('click', function (evt) {
 
-  scaleControlBigger.addEventListener('click', function () {
-    increaseScale();
+    if (evt.target.className === 'scale__control  scale__control--smaller') {
+      decreaseScale();
+    }
+    if (evt.target.className === 'scale__control  scale__control--bigger') {
+      increaseScale();
+    }
   });
-
   // ..............................Хэш-теги
 
   // хэш-тег начинается с символа # (решётка)
