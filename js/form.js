@@ -17,6 +17,7 @@
   var scaleControlValueMonitor = imgUploadOverlay.querySelector('.scale__control--value');
   var textHashtags = document.querySelector('.text__hashtags');
   var textDescription = document.querySelector('.text__description');
+  var ESC_BUTTON = 27;
   var SCALE_STEP = 25;
   var MIN_SCALE = 25;
   var MAX_SCALE = 100;
@@ -114,7 +115,7 @@
   });
 
   var onButtonEsc = function (evt) {
-    if (evt.keyCode === 27) {
+    if (evt.keyCode === ESC_BUTTON) {
       imgUploadOverlay.classList.add('visually-hidden');
       if (successUpload) {
         successUpload.classList.add('visually-hidden');
@@ -267,7 +268,13 @@
   };
 
   var checkSpace = function (hashTags) {
-    return hashTags.indexOf(',') > -1;
+    var count = 0;
+    var symbolSharp = hashTags.indexOf('#');
+    while (symbolSharp !== -1) {
+      count++;
+      symbolSharp = hashTags.indexOf('#', symbolSharp + 1);
+    }
+    return count > 1 ? true : false;
   };
 
   var checkDoubleHashtag = function (hashTags) {

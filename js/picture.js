@@ -9,12 +9,13 @@
   var photosFromServer = [];
   var copyPhotosDis = [];
   var copyPhotosNew = [];
+  var ESC_CODE = 27;
   var QTY_NEW_PHOTO = 10;
 
   var openBigPicture = function () {
     window.preview.bigPictureElement.classList.remove('hidden');
     document.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === 27) {
+      if (evt.keyCode === ESC_CODE) {
         window.preview.bigPictureElement.classList.add('hidden');
       }
     });
